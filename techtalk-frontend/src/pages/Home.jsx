@@ -110,6 +110,39 @@ const Home = () => {
 
   return (
     <div className="app-bg">
+      {/* Navbar */}
+      <nav className="navbar sticky top-0 z-50">
+        <div className="container mx-auto">
+          <div className="flex justify-between items-center">
+            <Link to="/" className="text-2xl font-bold text-white hover:text-blue-400 transition">
+              🚀 TechTalk
+            </Link>
+            
+            <div className="flex items-center gap-6">
+              <Link to="/home" className="nav-link">Feed</Link>
+              <Link to="/explore" className="nav-link">Explore</Link>
+              <Link to="/search" className="nav-link">Search</Link>
+              
+              {user ? (
+                <>
+                  <Link to="/messages" className="nav-link">Messages</Link>
+                  <Link to="/notifications" className="nav-link">Notifications</Link>
+                  <Link to="/profile" className="nav-link">Profile</Link>
+                  <button onClick={() => { localStorage.removeItem('token'); window.location.href = '/'; }} className="btn-secondary">Logout</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/messages" className="nav-link">Messages</Link>
+                  <Link to="/notifications" className="nav-link">Notifications</Link>
+                  <Link to="/login" className="btn-secondary">Login</Link>
+                  <Link to="/register" className="btn-primary">Sign Up</Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {showOnboarding && <OnboardingModal user={user} onClose={() => setShowOnboarding(false)} />}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

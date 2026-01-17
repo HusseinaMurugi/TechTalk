@@ -14,6 +14,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [bio, setBio] = useState(user?.bio || '');
   const [profilePic, setProfilePic] = useState(user?.profile_pic || '');
+  const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
     loadProfile();
@@ -42,8 +43,21 @@ const Profile = () => {
       const response = await api.put('/profile', { bio, profile_pic: profilePic });
       updateUser(response.data);
       setIsEditing(false);
+      setImageFile(null);
     } catch (error) {
       console.error('Error updating profile:', error);
+    }
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePic(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -74,13 +88,27 @@ const Profile = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1 text-black">Profile Picture URL</label>
+                    <label className="block text-sm font-medium mb-1 text-black">Profile Picture</label>
+                    <label className="cursor-pointer bg-[#1f3b5c] hover:bg-[#2b4c6f] px-4 py-2 rounded transition flex items-center justify-center gap-2 text-white font-medium mb-2">
+                      <span>📷</span>
+                      <span>Upload from Gallery</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                    </label>
                     <input
                       type="text"
                       value={profilePic}
                       onChange={(e) => setProfilePic(e.target.value)}
+                      placeholder="Or paste image URL"
                       className="w-full border-2 border-gray-300 rounded px-3 py-2 text-black"
                     />
+                    {profilePic && (
+                      <img src={profilePic} alt="Preview" className="mt-2 w-16 h-16 rounded-full object-cover border-2 border-[#1f6feb]" />
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <button type="submit" className="btn-primary">

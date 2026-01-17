@@ -1,12 +1,13 @@
 // User profile page - view other users' profiles
 import { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import PostCard from '../components/PostCard';
 import api from '../utils/api';
 
 const UserProfile = () => {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const { user: currentUser } = useContext(AuthContext);
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -88,7 +89,7 @@ const UserProfile = () => {
                     {isFollowing ? 'Unfollow' : 'Follow'}
                   </button>
                   <button
-                    onClick={() => window.location.href = `/messages?user=${userId}`}
+                    onClick={() => navigate('/messages', { state: { selectedUserId: userId } })}
                     className="btn-secondary"
                   >
                     Message

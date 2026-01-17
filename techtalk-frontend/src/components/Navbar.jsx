@@ -36,7 +36,7 @@ const Navbar = () => {
       <div className="container mx-auto">
         <div className="flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-white hover:text-blue-400 transition">
-            🚀 TechTalk
+             TechTalk
           </Link>
           
           <div className="flex items-center gap-6">
