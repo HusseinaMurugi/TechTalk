@@ -19,13 +19,19 @@ from auth import hash_password, verify_password, create_access_token, get_curren
 app = FastAPI(title="TechTalk API")
 
 # CORS middleware - allows frontend to communicate with backend
+# CORS middleware - allows frontend to communicate with backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:3000",       # Local React dev server
+        "http://localhost:5173",       # Another local dev port (Vite)
+        "https://tech-talk-virid.vercel.app"  # Your deployed Vercel frontend
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Initialize database on startup
 @app.on_event("startup")
