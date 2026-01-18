@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 from database import SessionLocal, init_db
 from models import User, Post, Comment, Like, Follower
-from auth import hash_password
+from backend.auth import hash_password
 
 def seed_database():
     init_db()
