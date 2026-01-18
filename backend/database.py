@@ -1,7 +1,7 @@
 # Database connection and session management
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from backend.models import Base
+from models import Base
 
 DATABASE_URL = "sqlite:///./techtalk.db"
 

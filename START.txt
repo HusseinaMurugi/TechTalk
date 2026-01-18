@@ -8,12 +8,19 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  STEP 0: SETUP (First Time Only)                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+Double-click: setup.bat
+  (This will install all dependencies and seed the database)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  STEP 1: START BACKEND                                                       │
 └──────────────────────────────────────────────────────────────────────────────┘
 
 Open Terminal 1:
   $ cd backend
-  $ ./start.sh
+  $ start.bat
 
 ✅ Backend will start on: http://localhost:8000
 ✅ API Documentation: http://localhost:8000/docs
@@ -24,7 +31,7 @@ Open Terminal 1:
 
 Open Terminal 2:
   $ cd frontend
-  $ ./start.sh
+  $ start.bat
 
 ✅ Frontend will start on: http://localhost:5173
 

@@ -1,8 +1,8 @@
 # Seed database with example data
 from sqlalchemy.orm import Session
-from backend.database import SessionLocal, init_db
-from backend.models import User, Post, Comment, Like, Follower
-from backend.auth import hash_password
+from database import SessionLocal, init_db
+from models import User, Post, Comment, Like, Follower
+from auth import hash_password
 
 def seed_database():
     init_db()

@@ -6,15 +6,15 @@ from sqlalchemy import or_, func
 from typing import List
 from datetime import datetime
 
-from backend.database import get_db, init_db
-from backend.models import User, Post, Comment, Like, Follower, Notification, Repost, Message
+from database import get_db, init_db
+from models import User, Post, Comment, Like, Follower, Notification, Repost, Message
 from schemas import (
     UserCreate, UserLogin, UserUpdate, UserResponse,
     PostCreate, PostUpdate, PostResponse,
     CommentCreate, CommentResponse,
     NotificationResponse, Token, MessageCreate, MessageResponse
 )
-from backend.auth import hash_password, verify_password, create_access_token, get_current_user
+from auth import hash_password, verify_password, create_access_token, get_current_user
 
 app = FastAPI(title="TechTalk API")
 
@@ -133,7 +133,9 @@ def create_post(
     # Add computed fields
     new_post.likes_count = 0
     new_post.comments_count = 0
+    new_post.reposts_count = 0
     new_post.is_liked = False
+    new_post.is_reposted = False
     return new_post
 
 # Get public feed - all recent posts (no auth required)
@@ -149,7 +151,9 @@ def get_public_feed(
     for post in posts:
         post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
         post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
+        post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
         post.is_liked = False
+        post.is_reposted = False
         result.append(post)
     
     return result
@@ -176,13 +180,19 @@ def get_feed(
     for post in posts:
         likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
         comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
+        reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
         is_liked = db.query(Like).filter(
             Like.post_id == post.id, Like.user_id == current_user.id
+        ).first() is not None
+        is_reposted = db.query(Repost).filter(
+            Repost.post_id == post.id, Repost.user_id == current_user.id
         ).first() is not None
         
         post.likes_count = likes_count
         post.comments_count = comments_count
+        post.reposts_count = reposts_count
         post.is_liked = is_liked
+        post.is_reposted = is_reposted
         result.append(post)
     
     return result
@@ -222,8 +232,12 @@ def get_post(
     # Add computed fields
     post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
     post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
+    post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
     post.is_liked = db.query(Like).filter(
         Like.post_id == post.id, Like.user_id == current_user.id
+    ).first() is not None
+    post.is_reposted = db.query(Repost).filter(
+        Repost.post_id == post.id, Repost.user_id == current_user.id
     ).first() is not None
     
     return post
@@ -240,7 +254,9 @@ def get_user_posts(
     for post in posts:
         post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
         post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
+        post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
         post.is_liked = False  # Default to false for non-authenticated users
+        post.is_reposted = False
         result.append(post)
     
     return result
@@ -262,7 +278,9 @@ def get_user_reposts(
     for post in posts:
         post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
         post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
+        post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
         post.is_liked = False
+        post.is_reposted = False
         result.append(post)
     
     return result
@@ -290,8 +308,12 @@ def update_post(
     
     post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
     post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
+    post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
     post.is_liked = db.query(Like).filter(
         Like.post_id == post.id, Like.user_id == current_user.id
+    ).first() is not None
+    post.is_reposted = db.query(Repost).filter(
+        Repost.post_id == post.id, Repost.user_id == current_user.id
     ).first() is not None
     
     return post
@@ -326,8 +348,12 @@ def search_posts(
     for post in posts:
         post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
         post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
+        post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
         post.is_liked = db.query(Like).filter(
             Like.post_id == post.id, Like.user_id == current_user.id
+        ).first() is not None
+        post.is_reposted = db.query(Repost).filter(
+            Repost.post_id == post.id, Repost.user_id == current_user.id
         ).first() is not None
         result.append(post)
     
