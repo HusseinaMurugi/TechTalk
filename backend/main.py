@@ -23,9 +23,10 @@ app = FastAPI(title="TechTalk API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",       # Local React dev server
-        "http://localhost:5173",       # Another local dev port (Vite)
-        "https://tech-talk-virid.vercel.app"  # Your deployed Vercel frontend
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://tech-talk-tau.vercel.app",
+        "https://*.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
