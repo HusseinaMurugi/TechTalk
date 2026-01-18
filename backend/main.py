@@ -6,8 +6,8 @@ from sqlalchemy import or_, func
 from typing import List
 from datetime import datetime
 
-from database import get_db, init_db
-from models import User, Post, Comment, Like, Follower, Notification, Repost, Message
+from backend.database import get_db, init_db
+from backend.models import User, Post, Comment, Like, Follower, Notification, Repost, Message
 from schemas import (
     UserCreate, UserLogin, UserUpdate, UserResponse,
     PostCreate, PostUpdate, PostResponse,

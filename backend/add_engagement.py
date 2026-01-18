@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Add realistic engagement numbers to existing data
 from sqlalchemy.orm import Session
-from database import SessionLocal
-from models import User, Post, Comment, Like, Follower, Repost
+from backend.database import SessionLocal
+from backend.models import User, Post, Comment, Like, Follower, Repost
 from backend.auth import hash_password
 import random
 
