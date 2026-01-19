@@ -18,6 +18,15 @@ from auth import hash_password, verify_password, create_access_token, get_curren
 
 app = FastAPI(title="TechTalk API")
 
+# Configure CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins - you can be more restrictive if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Allowed origins for CORS
 allowed_origins = [
     "https://tech-talk-woad.vercel.app",  # Old Vercel frontend URL
@@ -25,28 +34,6 @@ allowed_origins = [
     "http://localhost:5173",  # Local development
     "http://127.0.0.1:5173",
 ]
-
-@app.middleware("http")
-async def cors_handler(request, call_next):
-    origin = request.headers.get("origin")
-    
-    # Allow all vercel.app domains for flexibility with preview deployments
-    is_allowed = origin and "vercel.app" in origin
-    
-    if request.method == "OPTIONS":
-        return JSONResponse(
-            content={},
-            headers={
-                "Access-Control-Allow-Origin": origin if is_allowed else "*",
-                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            }
-        )
-    response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = origin if is_allowed else "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    return response
 
 
 # Initialize database on startup
