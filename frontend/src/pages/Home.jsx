@@ -5,7 +5,10 @@ import { TrendingUp, Users, Hash } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import PostCard from '../components/PostCard';
 import OnboardingModal from '../components/OnboardingModal';
-import api from '../utils/api';
+import axios from 'axios'; // we'll use axios directly
+
+const backendURL = 'http://127.0.0.1:8000';
+
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -37,7 +40,7 @@ const Home = () => {
   const loadFeed = async () => {
     try {
       const endpoint = user ? '/feed' : '/feed/public';
-      const response = await api.get(endpoint);
+      const response = await axios.get(`${backendURL}${endpoint}`);
       setPosts(response.data);
     } catch (error) {
       console.error('Error loading feed:', error);
@@ -48,7 +51,7 @@ const Home = () => {
 
   const loadSuggestedUsers = async () => {
     try {
-      const response = await api.get('/users/suggested');
+      const response = await axios.get(`${backendURL}/users/suggested`);
       setSuggestedUsers(response.data);
     } catch (error) {
       console.error('Error loading suggested users:', error);
@@ -58,8 +61,8 @@ const Home = () => {
   const loadTrending = async () => {
     try {
       const [tagsRes, usersRes] = await Promise.all([
-        api.get('/trending/tags'),
-        api.get('/trending/users')
+        axios.get(`${backendURL}/trending/tags`),
+        axios.get(`${backendURL}/trending/users`)
       ]);
       setTrendingTags(tagsRes.data);
       setTrendingUsers(usersRes.data);
@@ -85,7 +88,7 @@ const Home = () => {
     if (!newPost.trim()) return;
 
     try {
-      await api.post('/posts', { 
+      await axios.post(`${backendURL}/posts`, { 
         content: newPost,
         image_url: imagePreview || '',
         tags: tags
@@ -98,6 +101,7 @@ const Home = () => {
     } catch (error) {
       console.error('Error creating post:', error);
     }
+
   };
 
   if (loading) {
