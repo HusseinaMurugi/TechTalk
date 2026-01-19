@@ -18,14 +18,30 @@ from auth import hash_password, verify_password, create_access_token, get_curren
 
 app = FastAPI(title="TechTalk API")
 
-# Configure CORS middleware
+# Configure CORS middleware - MUST be first
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=False,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Add exception handler to ensure CORS headers are in error responses
+from fastapi import Request
+from fastapi.responses import Response
+
+@app.exception_handler(Exception)
+async def universal_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
 
 # Allowed origins for CORS
 allowed_origins = [
@@ -56,7 +72,13 @@ def test_cors():
 async def preflight(full_path: str):
     return JSONResponse(
         content={},
-        status_code=200
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
+            "Access-Control-Max-Age": "600",
+        }
     )
 
 # Register new user
