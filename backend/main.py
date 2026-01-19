@@ -23,7 +23,8 @@ allowed_origins = [
     "https://tech-talk-woad.vercel.app",  # Old Vercel frontend URL
     "https://tech-talk-three.vercel.app",  # Another Vercel frontend URL
     "https://tech-talk-nzw9hnf3x-husseinamurugis-projects.vercel.app",  # Previous Vercel URL
-    "https://tech-talk-6kd4gydbz-husseinamurugis-projects.vercel.app",  # Current Vercel frontend URL
+    "https://tech-talk-6kd4gydbz-husseinamurugis-projects.vercel.app",  # Previous Vercel frontend URL
+    "https://tech-talk-92d6oye5d-husseinamurugis-projects.vercel.app",  # Current Vercel frontend URL
     "https://techtalk-backend-kwg8.onrender.com",  # Your new backend URL
     "http://localhost:5173",  # Local development
     "http://127.0.0.1:5173",
