@@ -7,7 +7,7 @@ import PostCard from '../components/PostCard';
 import OnboardingModal from '../components/OnboardingModal';
 import axios from 'axios'; // we'll use axios directly
 
-const backendURL = 'https://techtalk-zqld.onrender.com';
+const backendURL = import.meta.env.VITE_API_URL || 'https://techtalk-backend-kwg8.onrender.com';
 
 
 const Home = () => {
