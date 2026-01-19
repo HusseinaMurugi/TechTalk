@@ -21,8 +21,8 @@ app = FastAPI(title="TechTalk API")
 # Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins - you can be more restrictive if needed
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -56,12 +56,7 @@ def test_cors():
 async def preflight(full_path: str):
     return JSONResponse(
         content={},
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        }
+        status_code=200
     )
 
 # Register new user
