@@ -30,26 +30,22 @@ allowed_origins = [
 async def cors_handler(request, call_next):
     origin = request.headers.get("origin")
     
-    # Allow all Vercel preview URLs and husseinamurugis-projects URLs
-    is_allowed = (
-        origin in allowed_origins or
-        (origin and origin.endswith(".vercel.app")) or
-        (origin and "husseinamurugis-projects.vercel.app" in origin)
-    )
+    # Allow all vercel.app domains for flexibility with preview deployments
+    is_allowed = origin and "vercel.app" in origin
     
     if request.method == "OPTIONS":
         return JSONResponse(
             content={},
             headers={
                 "Access-Control-Allow-Origin": origin if is_allowed else "*",
-                "Access-Control-Allow-Methods": "*",
-                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
             }
         )
     response = await call_next(request)
     response.headers["Access-Control-Allow-Origin"] = origin if is_allowed else "*"
-    response.headers["Access-Control-Allow-Methods"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return response
 
 
