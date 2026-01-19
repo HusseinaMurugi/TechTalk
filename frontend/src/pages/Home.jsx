@@ -49,7 +49,7 @@ const Home = () => {
 
   const loadSuggestedUsers = async () => {
     try {
-      const response = await axios.get(`${backendURL}/users/suggested`);
+      const response = await api.get('/users/suggested');
       setSuggestedUsers(response.data);
     } catch (error) {
       console.error('Error loading suggested users:', error);
@@ -59,8 +59,8 @@ const Home = () => {
   const loadTrending = async () => {
     try {
       const [tagsRes, usersRes] = await Promise.all([
-        axios.get(`${backendURL}/trending/tags`),
-        axios.get(`${backendURL}/trending/users`)
+        api.get('/trending/tags'),
+        api.get('/trending/users')
       ]);
       setTrendingTags(tagsRes.data);
       setTrendingUsers(usersRes.data);
@@ -86,7 +86,7 @@ const Home = () => {
     if (!newPost.trim()) return;
 
     try {
-      await axios.post(`${backendURL}/posts`, { 
+      await api.post('/posts', { 
         content: newPost,
         image_url: imagePreview || '',
         tags: tags
