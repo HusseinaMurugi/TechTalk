@@ -1,6 +1,7 @@
 # Main FastAPI application with all routes
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 from typing import List, Optional
@@ -27,6 +28,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Add CORS headers to all responses
+@app.middleware("http")
+async def add_cors_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
+
 
 # Initialize database on startup
 @app.on_event("startup")
@@ -36,7 +46,12 @@ def startup_event():
 # Root endpoint
 @app.get("/")
 def root():
-    return {"message": "TechTalk API"}
+    return {"message": "TechTalk API", "cors": "enabled"}
+
+# Test CORS endpoint
+@app.get("/test")
+def test_cors():
+    return {"status": "ok", "cors": "working"}
 
 # Register new user
 @app.post("/register", response_model=Token)
