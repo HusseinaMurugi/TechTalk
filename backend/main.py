@@ -41,7 +41,7 @@ async def cors_handler(request, call_next):
 def startup_event():
     init_db()
 
-# Root endpoint
+# Root endpoint - CORS fixed
 @app.get("/")
 def root():
     return {"message": "TechTalk API", "cors": "enabled"}
