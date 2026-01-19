@@ -51,6 +51,19 @@ def root():
 def test_cors():
     return {"status": "ok", "cors": "working"}
 
+# Handle CORS preflight requests
+@app.options("/{full_path:path}")
+async def preflight(full_path: str):
+    return JSONResponse(
+        content={},
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        }
+    )
+
 # Register new user
 @app.post("/register", response_model=Token)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
