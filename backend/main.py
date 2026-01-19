@@ -20,7 +20,8 @@ app = FastAPI(title="TechTalk API")
 
 # Allowed origins for CORS
 allowed_origins = [
-    "https://tech-talk-woad.vercel.app",  # Your Vercel frontend URL
+    "https://tech-talk-woad.vercel.app",  # Old Vercel frontend URL
+    "https://tech-talk-three.vercel.app",  # New Vercel frontend URL
     "https://techtalk-backend-kwg8.onrender.com",  # Your new backend URL
     "http://localhost:5173",  # Local development
     "http://127.0.0.1:5173",
