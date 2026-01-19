@@ -16,9 +16,10 @@ const SuggestedUsers = ({ onFollow }) => {
     setLoading(true);
     try {
       const response = await api.get('/users/suggested?limit=10');
-      setUsers(response.data);
+      setUsers(response.data || []);
     } catch (error) {
       console.error('Error fetching suggested users:', error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
