@@ -1,4 +1,4 @@
-// Home feed page - unified feed with trending sidebar
+// Home feed page - unified feed with trending sidebar - Updated
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Users, Hash } from 'lucide-react';
