@@ -104,6 +104,7 @@ TechTalk/
 │  └─ .env
 └─ README.md
 
+Authors: Group 6 members
 
 📄 License
 
