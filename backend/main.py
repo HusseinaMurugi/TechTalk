@@ -183,18 +183,24 @@ def get_public_feed(
     skip: int = 0,
     limit: int = 50
 ):
-    posts = db.query(Post).order_by(Post.timestamp.desc()).offset(skip).limit(limit).all()
-    
-    result = []
-    for post in posts:
-        post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
-        post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
-        post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
-        post.is_liked = False
-        post.is_reposted = False
-        result.append(post)
-    
-    return result
+    try:
+        posts = db.query(Post).order_by(Post.timestamp.desc()).offset(skip).limit(limit).all()
+        
+        result = []
+        for post in posts:
+            try:
+                post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar() or 0
+                post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar() or 0
+                post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar() or 0
+                post.is_liked = False
+                post.is_reposted = False
+                result.append(post)
+            except Exception:
+                continue
+        
+        return result
+    except Exception:
+        return []
 
 # Get feed - posts from followed users
 @app.get("/feed", response_model=List[PostResponse])
