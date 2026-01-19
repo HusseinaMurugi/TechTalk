@@ -18,19 +18,28 @@ from auth import hash_password, verify_password, create_access_token, get_curren
 
 app = FastAPI(title="TechTalk API")
 
+# Allowed origins for CORS
+allowed_origins = [
+    "https://tech-talk-woad.vercel.app",  # Your Vercel frontend URL
+    "http://localhost:5173",  # Local development
+    "http://127.0.0.1:5173",
+]
+
 @app.middleware("http")
 async def cors_handler(request, call_next):
+    origin = request.headers.get("origin")
+    
     if request.method == "OPTIONS":
         return JSONResponse(
             content={},
             headers={
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": origin if origin in allowed_origins else "*",
                 "Access-Control-Allow-Methods": "*",
                 "Access-Control-Allow-Headers": "*",
             }
         )
     response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Origin"] = origin if origin in allowed_origins else "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "*"
     return response
