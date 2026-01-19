@@ -7,7 +7,7 @@ import PostCard from '../components/PostCard';
 import OnboardingModal from '../components/OnboardingModal';
 import axios from 'axios'; // we'll use axios directly
 
-const backendURL = 'http://127.0.0.1:8000';
+const backendURL = 'https://techtalk-zqld.onrender.com';
 
 
 const Home = () => {
