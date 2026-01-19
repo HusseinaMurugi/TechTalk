@@ -634,6 +634,18 @@ def mark_all_notifications_read(
     db.commit()
     return {"message": "All notifications marked as read"}
 
+# Get unread notifications count
+@app.get("/notifications/unread-count")
+def get_unread_notifications_count(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    count = db.query(func.count(Notification.id)).filter(
+        Notification.user_id == current_user.id,
+        Notification.read == False
+    ).scalar()
+    return {"count": count}
+
 
 # Repost a post
 @app.post("/posts/{post_id}/repost")
