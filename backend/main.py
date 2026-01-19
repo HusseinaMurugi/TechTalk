@@ -31,6 +31,13 @@ app.add_middleware(
 # Add CORS headers to all responses
 @app.middleware("http")
 async def add_cors_headers(request, call_next):
+    if request.method == "OPTIONS":
+        response = JSONResponse(content={})
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        return response
+    
     response = await call_next(request)
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
@@ -243,9 +250,13 @@ def get_suggested_users(
     db: Session = Depends(get_db),
     limit: int = 5
 ):
-    # Get random users for public access
-    suggested = db.query(User).limit(limit).all()
-    return suggested
+    try:
+        # Get random users for public access
+        suggested = db.query(User).limit(limit).all()
+        return suggested
+    except Exception as e:
+        print(f"Error in suggested users: {e}")
+        return []
 
 # Get single post by ID
 @app.get("/posts/{post_id}", response_model=PostResponse)
