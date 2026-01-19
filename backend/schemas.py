@@ -2,6 +2,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
+from typing import List
 
 class UserCreate(BaseModel):
     username: str
@@ -75,6 +76,8 @@ class NotificationResponse(BaseModel):
     message: str
     read: bool
     timestamp: datetime
+    related_user_id: Optional[int] = None
+    related_post_id: Optional[int] = None
     
     class Config:
         from_attributes = True

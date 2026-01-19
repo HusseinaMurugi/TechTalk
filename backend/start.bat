@@ -11,6 +11,10 @@ if %errorlevel% neq 0 (
 )
 
 echo.
+echo Running database migration...
+python migrate.py
+
+echo.
 echo Seeding database...
 python seed.py
 

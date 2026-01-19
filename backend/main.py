@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 from database import get_db, init_db
@@ -136,6 +136,30 @@ def create_post(
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
+    
+    # Process mentions in content
+    import re
+    mentions = re.findall(r'@(\w+)', post_data.content)
+    for username in mentions:
+        mentioned_user = db.query(User).filter(User.username == username).first()
+        if mentioned_user and mentioned_user.id != current_user.id:
+            try:
+                notification = Notification(
+                    user_id=mentioned_user.id,
+                    type="mention",
+                    message=f"{current_user.username} mentioned you in a post",
+                    related_user_id=current_user.id,
+                    related_post_id=new_post.id
+                )
+            except Exception:
+                # Fallback for old schema
+                notification = Notification(
+                    user_id=mentioned_user.id,
+                    type="mention",
+                    message=f"{current_user.username} mentioned you in a post"
+                )
+            db.add(notification)
+    db.commit()
     
     # Add computed fields
     new_post.likes_count = 0
@@ -394,7 +418,9 @@ def create_comment(
         notification = Notification(
             user_id=post.user_id,
             type="comment",
-            message=f"{current_user.username} commented on your post"
+            message=f"{current_user.username} commented on your post",
+            related_user_id=current_user.id,
+            related_post_id=post_id
         )
         db.add(notification)
         db.commit()
@@ -453,7 +479,9 @@ def like_post(
         notification = Notification(
             user_id=post.user_id,
             type="like",
-            message=f"{current_user.username} liked your post"
+            message=f"{current_user.username} liked your post",
+            related_user_id=current_user.id,
+            related_post_id=post_id
         )
         db.add(notification)
         db.commit()
@@ -510,7 +538,8 @@ def follow_user(
     notification = Notification(
         user_id=user_id,
         type="follow",
-        message=f"{current_user.username} started following you"
+        message=f"{current_user.username} started following you",
+        related_user_id=current_user.id
     )
     db.add(notification)
     db.commit()
@@ -631,7 +660,9 @@ def repost_post(
         notification = Notification(
             user_id=post.user_id,
             type="repost",
-            message=f"{current_user.username} reposted your post"
+            message=f"{current_user.username} reposted your post",
+            related_user_id=current_user.id,
+            related_post_id=post_id
         )
         db.add(notification)
         db.commit()
@@ -784,11 +815,26 @@ def get_trending_users(db: Session = Depends(get_db), limit: int = 10):
         .group_by(User.id).order_by(func.count(Follower.id).desc()).limit(limit).all()
     return users
 
-# Get unread notification count
-@app.get("/notifications/unread-count")
-def get_unread_count(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    count = db.query(func.count(Notification.id)).filter(
-        Notification.user_id == current_user.id,
-        Notification.read == False
-    ).scalar()
-    return {"unread_count": count}
+# Get posts where user is mentioned
+@app.get("/users/{user_id}/mentions", response_model=List[PostResponse])
+def get_user_mentions(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Find posts that mention this user
+    posts = db.query(Post).filter(Post.content.contains(f"@{user.username}")).order_by(Post.timestamp.desc()).all()
+    
+    result = []
+    for post in posts:
+        post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
+        post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
+        post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
+        post.is_liked = False
+        post.is_reposted = False
+        result.append(post)
+    
+    return result

@@ -57,7 +57,7 @@ const OnboardingModal = ({ user, onClose }) => {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="I'm a developer passionate about..."
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 resize-none focus:border-blue-500 focus:outline-none transition"
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 resize-none focus:border-blue-500 focus:outline-none transition text-gray-800"
                 rows="4"
               />
             </div>

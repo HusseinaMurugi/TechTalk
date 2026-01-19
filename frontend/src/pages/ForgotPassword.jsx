@@ -37,10 +37,10 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+    <div className="app-bg min-h-screen flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">TechTalk</h1>
-        <h2 className="text-xl font-semibold mb-4">Reset Password</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">Reset Password</h2>
         
         {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
         {success && <div className="bg-green-100 text-green-700 p-3 rounded mb-4">{success}</div>}
@@ -48,57 +48,57 @@ const ForgotPassword = () => {
         {step === 1 ? (
           <form onSubmit={handleVerify}>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Email</label>
+              <label className="block text-gray-700 mb-2 font-medium">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border rounded px-3 py-2"
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-gray-800 focus:border-blue-500 focus:outline-none transition"
                 required
               />
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2">Security Answer</label>
+              <label className="block text-gray-700 mb-2 font-medium">Security Answer</label>
               <input
                 type="text"
                 value={securityAnswer}
                 onChange={(e) => setSecurityAnswer(e.target.value)}
                 placeholder="Answer to your security question"
-                className="w-full border rounded px-3 py-2"
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-gray-800 focus:border-blue-500 focus:outline-none transition"
                 required
               />
             </div>
             
-            <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+            <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition font-semibold">
               Verify
             </button>
           </form>
         ) : (
           <form onSubmit={handleReset}>
-            <div className="mb-4 p-3 bg-blue-50 rounded">
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-gray-700"><strong>Your Question:</strong> {securityQuestion}</p>
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2">New Password</label>
+              <label className="block text-gray-700 mb-2 font-medium">New Password</label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full border rounded px-3 py-2"
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-gray-800 focus:border-blue-500 focus:outline-none transition"
                 required
               />
             </div>
             
-            <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+            <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition font-semibold">
               Reset Password
             </button>
           </form>
         )}
         
-        <p className="mt-4 text-center">
-          <Link to="/login" className="text-blue-600 hover:underline">Back to Login</Link>
+        <p className="mt-6 text-center">
+          <Link to="/login" className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition">Back to Login</Link>
         </p>
       </div>
     </div>

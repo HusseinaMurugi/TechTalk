@@ -102,4 +102,8 @@ class Notification(Base):
     read = Column(Boolean, default=False)
     timestamp = Column(DateTime, default=datetime.utcnow, index=True)
     
-    user = relationship("User", back_populates="notifications")
+    # Additional context fields (optional for backward compatibility)
+    related_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    related_post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), nullable=True)
+    
+    user = relationship("User", back_populates="notifications", foreign_keys=[user_id])

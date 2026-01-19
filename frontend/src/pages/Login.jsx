@@ -25,7 +25,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="app-bg min-h-screen flex items-center justify-center p-4">
       <div className="bg-[#0f2a44] p-8 rounded-lg shadow-md w-full max-w-md border border-[#1f3b5c]">
         <h1 className="text-3xl font-bold text-center mb-6 text-white">TechTalk</h1>
         <h2 className="text-xl font-semibold mb-4 text-white">Login</h2>

@@ -1,8 +1,8 @@
 // Messages page - Direct messaging
 import { useState, useEffect, useContext } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Search, X, Plus } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
-import { formatDate } from '../utils/date';
 import api from '../utils/api';
 import LoginRequired from './LoginRequired';
 
@@ -13,6 +13,10 @@ const Messages = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [showUserSearch, setShowUserSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   if (!user) {
     return <LoginRequired />;
@@ -26,6 +30,51 @@ const Messages = () => {
       loadUserAndMessages(location.state.selectedUserId);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    const searchTimeout = setTimeout(() => {
+      if (searchQuery.trim() && searchQuery.length > 1) {
+        performUserSearch();
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+    return () => clearTimeout(searchTimeout);
+  }, [searchQuery]);
+
+  const formatMessageTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = (now - date) / (1000 * 60 * 60);
+    
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffInHours < 168) { // Less than a week
+      return date.toLocaleDateString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+    } else {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+  };
+
+  const performUserSearch = async () => {
+    setIsSearching(true);
+    try {
+      const response = await api.get(`/search/users?q=${searchQuery}`);
+      setSearchResults(response.data.slice(0, 10));
+    } catch (error) {
+      console.error('Error searching users:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const startNewConversation = (selectedUser) => {
+    setSelectedUser(selectedUser);
+    setMessages([]);
+    setShowUserSearch(false);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
 
   const loadUserAndMessages = async (userId) => {
     try {
@@ -85,9 +134,89 @@ const Messages = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Conversations List */}
           <div className="md:col-span-1 card-dark overflow-hidden">
-            <div className="p-4 border-b border-[#1f3b5c] bg-[#1f3b5c]">
-              <h2 className="font-bold text-lg text-white">Conversations</h2>
+            <div className="p-4 border-b border-[#1f3b5c] bg-[#1f3b5c] flex items-center justify-between">
+              <h2 className="font-bold text-lg text-white">Messages</h2>
+              <button
+                onClick={() => setShowUserSearch(true)}
+                className="text-white hover:text-blue-300 transition"
+                title="New message"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
             </div>
+            
+            {/* User Search Modal */}
+            {showUserSearch && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+                  <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-800">New Message</h3>
+                    <button
+                      onClick={() => {
+                        setShowUserSearch(false);
+                        setSearchQuery('');
+                        setSearchResults([]);
+                      }}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  <div className="p-4">
+                    <div className="relative mb-4">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search users..."
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800"
+                        autoFocus
+                      />
+                    </div>
+                    
+                    <div className="max-h-64 overflow-y-auto">
+                      {isSearching ? (
+                        <div className="text-center py-4 text-gray-500">
+                          <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                          Searching...
+                        </div>
+                      ) : searchResults.length > 0 ? (
+                        <div className="space-y-2">
+                          {searchResults.map(searchUser => (
+                            <button
+                              key={searchUser.id}
+                              onClick={() => startNewConversation(searchUser)}
+                              className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition text-left"
+                            >
+                              <img
+                                src={searchUser.profile_pic || 'https://via.placeholder.com/40'}
+                                alt={searchUser.username}
+                                className="w-10 h-10 rounded-full border border-gray-200"
+                              />
+                              <div>
+                                <p className="font-medium text-gray-800">{searchUser.username}</p>
+                                <p className="text-sm text-gray-500 truncate">{searchUser.bio || 'Tech enthusiast'}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      ) : searchQuery.length > 1 ? (
+                        <div className="text-center py-4 text-gray-500">
+                          No users found
+                        </div>
+                      ) : (
+                        <div className="text-center py-4 text-gray-500">
+                          Type to search for users
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="overflow-y-auto max-h-[600px]">
               {conversations.length === 0 ? (
                 <div className="p-8 text-center text-[#c9d1d9]">
@@ -157,8 +286,8 @@ const Messages = () => {
                         }`}
                       >
                         <p>{msg.content}</p>
-                        <p className={`text-xs mt-1 ${msg.sender_id === user.id ? 'text-blue-100' : 'text-[#8b949e]'}`}>
-                          {formatDate(msg.timestamp)}
+                        <p className="text-sm text-[#8b949e] mt-1">
+                          {formatMessageTime(msg.timestamp)}
                         </p>
                       </div>
                     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { TrendingUp, Users, Hash, Search } from 'lucide-react';
+import { TrendingUp, Users, Hash } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import PostCard from '../components/PostCard';
@@ -10,10 +10,7 @@ const Explore = () => {
   const [trendingTags, setTrendingTags] = useState([]);
   const [trendingUsers, setTrendingUsers] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState({ users: [], posts: [] });
   const [activeTab, setActiveTab] = useState('posts');
-  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     fetchTrendingTags();
@@ -28,7 +25,6 @@ const Explore = () => {
       setTrendingTags(response.data);
     } catch (error) {
       console.error('Error fetching trending tags:', error);
-      // Fallback to mock data
       const mockTags = [
         { tag: 'React', count: 1245 },
         { tag: 'Python', count: 2341 },
@@ -58,49 +54,13 @@ const Explore = () => {
     }
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    
-    setIsSearching(true);
-    try {
-      const [usersRes, postsRes] = await Promise.all([
-        api.get(`/search/users?q=${searchQuery}`),
-        api.get(`/search/posts?q=${searchQuery}`)
-      ]);
-      setSearchResults({ users: usersRes.data, posts: postsRes.data });
-      setActiveTab('search');
-    } catch (error) {
-      console.error('Error searching:', error);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
   return (
     <div className="app-bg min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header with Search */}
+      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 text-white">Explore</h1>
         <p className="text-[#c9d1d9] mb-4">Discover trending topics and connect with developers</p>
-        
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="max-w-2xl">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search users, posts, or topics..."
-              className="input flex-1"
-            />
-            <button type="submit" disabled={isSearching} className="btn-primary flex items-center gap-2">
-              <Search className="w-4 h-4" />
-              {isSearching ? 'Searching...' : 'Search'}
-            </button>
-          </div>
-        </form>
       </div>
 
       {/* Tabs */}
@@ -144,21 +104,6 @@ const Explore = () => {
             Trending Tags
           </div>
         </button>
-        {searchResults.users.length > 0 || searchResults.posts.length > 0 ? (
-          <button
-            onClick={() => setActiveTab('search')}
-            className={`pb-3 px-4 font-medium transition ${
-              activeTab === 'search'
-                ? 'text-[#1f6feb] border-b-2 border-[#1f6feb]'
-                : 'text-[#c9d1d9] hover:text-white'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
-              Search Results
-            </div>
-          </button>
-        ) : null}
       </div>
 
       {/* Content */}
@@ -244,59 +189,6 @@ const Explore = () => {
                   </Link>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Search Results Tab */}
-          {activeTab === 'search' && (
-            <div className="space-y-6">
-              {/* User Results */}
-              {searchResults.users.length > 0 && (
-                <div className="card-dark">
-                  <div className="p-6 border-b border-[#1f3b5c]">
-                    <h2 className="text-xl font-semibold">Users ({searchResults.users.length})</h2>
-                  </div>
-                  <div className="divide-y divide-[#1f3b5c]">
-                    {searchResults.users.map((searchUser) => (
-                      <Link
-                        key={searchUser.id}
-                        to={`/users/${searchUser.id}`}
-                        className="block p-6 hover:bg-[#1f3b5c]/50 transition"
-                      >
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={searchUser.profile_pic || 'https://via.placeholder.com/50'}
-                            alt={searchUser.username}
-                            className="avatar w-12 h-12"
-                          />
-                          <div>
-                            <h3 className="font-semibold">{searchUser.username}</h3>
-                            <p className="text-[#8b949e] text-sm">{searchUser.bio || 'Tech enthusiast'}</p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Post Results */}
-              {searchResults.posts.length > 0 && (
-                <div>
-                  <h2 className="text-xl font-semibold mb-4">Posts ({searchResults.posts.length})</h2>
-                  <div className="space-y-4">
-                    {searchResults.posts.map(post => (
-                      <PostCard key={post.id} post={post} onUpdate={fetchPublicPosts} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {searchResults.users.length === 0 && searchResults.posts.length === 0 && (
-                <div className="card-dark p-12 text-center">
-                  <p className="text-[#c9d1d9]">No results found for "{searchQuery}"</p>
-                </div>
-              )}
             </div>
           )}
         </div>
