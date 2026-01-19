@@ -5,9 +5,7 @@ import { TrendingUp, Users, Hash } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import PostCard from '../components/PostCard';
 import OnboardingModal from '../components/OnboardingModal';
-import axios from 'axios'; // we'll use axios directly
-
-const backendURL = import.meta.env.VITE_API_URL || 'https://techtalk-backend-kwg8.onrender.com';
+import api from '../utils/api'; // Use the api utility instead of axios directly
 
 
 const Home = () => {
@@ -40,7 +38,7 @@ const Home = () => {
   const loadFeed = async () => {
     try {
       const endpoint = user ? '/feed' : '/feed/public';
-      const response = await axios.get(`${backendURL}${endpoint}`);
+      const response = await api.get(endpoint);
       setPosts(response.data);
     } catch (error) {
       console.error('Error loading feed:', error);
