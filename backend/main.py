@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+# type: ignore
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
-from typing import List, Optional
-from datetime import datetime
+from typing import List
 
 from database import get_db, init_db
 from models import User, Post, Comment, Like, Follower, Notification, Repost, Message
@@ -21,6 +21,7 @@ app = FastAPI(title="TechTalk API")
 # Allowed origins for CORS
 allowed_origins = [
     "https://tech-talk-woad.vercel.app",  # Your Vercel frontend URL
+    "https://techtalk-backend-kwg8.onrender.com",  # Your new backend URL
     "http://localhost:5173",  # Local development
     "http://127.0.0.1:5173",
 ]
@@ -644,7 +645,7 @@ def mark_all_notifications_read(
 ):
     db.query(Notification).filter(
         Notification.user_id == current_user.id,
-        Notification.read == False
+        ~Notification.read
     ).update({"read": True})
     db.commit()
     return {"message": "All notifications marked as read"}
@@ -657,7 +658,7 @@ def get_unread_notifications_count(
 ):
     count = db.query(func.count(Notification.id)).filter(
         Notification.user_id == current_user.id,
-        Notification.read == False
+        ~Notification.read
     ).scalar()
     return {"count": count}
 
@@ -761,7 +762,7 @@ def get_conversations(
         if other_user_id not in conversations:
             other_user = db.query(User).filter(User.id == other_user_id).first()
             unread = db.query(func.count(Message.id)).filter(
-                and_(Message.sender_id == other_user_id, Message.receiver_id == current_user.id, Message.read == False)
+                and_(Message.sender_id == other_user_id, Message.receiver_id == current_user.id, ~Message.read)
             ).scalar()
             conversations[other_user_id] = {
                 "user": other_user,
@@ -789,7 +790,7 @@ def get_messages(
     ).order_by(Message.timestamp.asc()).all()
     
     db.query(Message).filter(
-        and_(Message.sender_id == user_id, Message.receiver_id == current_user.id, Message.read == False)
+        and_(Message.sender_id == user_id, Message.receiver_id == current_user.id, ~Message.read)
     ).update({"read": True})
     db.commit()
     
