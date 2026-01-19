@@ -1,4 +1,3 @@
-# Main FastAPI application with all routes
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -19,25 +18,17 @@ from auth import hash_password, verify_password, create_access_token, get_curren
 
 app = FastAPI(title="TechTalk API")
 
-# CORS middleware - allows frontend to communicate with backend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Add CORS headers to all responses
 @app.middleware("http")
-async def add_cors_headers(request, call_next):
+async def cors_handler(request, call_next):
     if request.method == "OPTIONS":
-        response = JSONResponse(content={})
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        return response
-    
+        return JSONResponse(
+            content={},
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Headers": "*",
+            }
+        )
     response = await call_next(request)
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
