@@ -147,8 +147,8 @@ const Messages = () => {
             
             {/* User Search Modal */}
             {showUserSearch && (
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-white/85 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md mx-4 border border-white/40">
                   <div className="p-4 border-b border-gray-200 flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-800">New Message</h3>
                     <button

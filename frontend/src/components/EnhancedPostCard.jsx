@@ -194,7 +194,7 @@ const EnhancedPostCard = ({ post, onUpdate }) => {
             {post.tags.split(',').map((tag, idx) => (
               <Link
                 key={idx}
-                to={`/search?q=${encodeURIComponent(tag.trim())}`}
+                to={`/topic/${encodeURIComponent(tag.trim())}`}
                 className="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200 transition"
               >
                 #{tag.trim()}

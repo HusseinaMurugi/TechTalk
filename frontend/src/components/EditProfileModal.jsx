@@ -121,11 +121,11 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-white/40">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">Edit Profile</h2>
+          <h2 className="text-2xl font-bold text-black">Edit Profile</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X className="w-6 h-6" />
           </button>
@@ -167,47 +167,47 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
               {/* Basic Information */}
               {activeSection === 'basic' && (
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-800">Basic Information</h3>
+                  <h3 className="text-xl font-semibold text-black">Basic Information</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
+                      <label className="block text-sm font-medium text-black mb-2">Display Name</label>
                       <input
                         type="text"
                         value={displayName}
                         onChange={(e) => { setDisplayName(e.target.value); setHasChanges(true); }}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                      <label className="block text-sm font-medium text-black mb-2">Username</label>
                       <input
                         type="text"
                         value={username}
                         onChange={(e) => { setUsername(e.target.value); setHasChanges(true); }}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                      <label className="block text-sm font-medium text-black mb-2">Email</label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => { setEmail(e.target.value); setHasChanges(true); }}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone (Optional)</label>
+                      <label className="block text-sm font-medium text-black mb-2">Phone (Optional)</label>
                       <input
                         type="tel"
                         value={phone}
                         onChange={(e) => { setPhone(e.target.value); setHasChanges(true); }}
                         placeholder="For 2FA notifications"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       />
                     </div>
                   </div>
@@ -217,18 +217,18 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
               {/* Profile Appearance */}
               {activeSection === 'appearance' && (
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-800">Profile Appearance</h3>
+                  <h3 className="text-xl font-semibold text-black">Profile Appearance</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+                      <label className="block text-sm font-medium text-black mb-2">Profile Picture</label>
                       <div className="flex items-center gap-4">
                         <img
                           src={profilePic || 'https://via.placeholder.com/80'}
                           alt="Profile"
                           className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
                         />
-                        <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                        <label className="btn-primary cursor-pointer">
                           <Camera className="w-4 h-4 inline mr-2" />
                           Upload
                           <input
@@ -242,7 +242,7 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Cover Photo</label>
+                      <label className="block text-sm font-medium text-black mb-2">Cover Photo</label>
                       <div className="w-full h-24 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
                         {coverPhoto ? (
                           <img src={coverPhoto} alt="Cover" className="w-full h-full object-cover rounded-lg" />
@@ -263,47 +263,47 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                    <label className="block text-sm font-medium text-black mb-2">Bio</label>
                     <textarea
                       value={bio}
                       onChange={(e) => { setBio(e.target.value); setHasChanges(true); }}
                       rows="4"
                       placeholder="Tell us about yourself..."
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      className="input resize-none"
                     />
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                      <label className="block text-sm font-medium text-black mb-2">Website</label>
                       <input
                         type="url"
                         value={website}
                         onChange={(e) => { setWebsite(e.target.value); setHasChanges(true); }}
                         placeholder="https://yoursite.com"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">GitHub</label>
+                      <label className="block text-sm font-medium text-black mb-2">GitHub</label>
                       <input
                         type="text"
                         value={github}
                         onChange={(e) => { setGithub(e.target.value); setHasChanges(true); }}
                         placeholder="username"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn</label>
+                      <label className="block text-sm font-medium text-black mb-2">LinkedIn</label>
                       <input
                         type="text"
                         value={linkedin}
                         onChange={(e) => { setLinkedin(e.target.value); setHasChanges(true); }}
                         placeholder="username"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       />
                     </div>
                   </div>
@@ -313,38 +313,38 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
               {/* Account Settings */}
               {activeSection === 'account' && (
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-800">Account Settings</h3>
+                  <h3 className="text-xl font-semibold text-black">Account Settings</h3>
                   
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-700">Change Password</h4>
+                    <h4 className="font-medium text-black">Change Password</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                        <label className="block text-sm font-medium text-black mb-2">Current Password</label>
                         <input
                           type={showPasswords ? "text" : "password"}
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="input pr-10"
                         />
                       </div>
                       
                       <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                        <label className="block text-sm font-medium text-black mb-2">New Password</label>
                         <input
                           type={showPasswords ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="input pr-10"
                         />
                       </div>
                       
                       <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                        <label className="block text-sm font-medium text-black mb-2">Confirm Password</label>
                         <input
                           type={showPasswords ? "text" : "password"}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="input pr-10"
                         />
                         <button
                           type="button"
@@ -360,8 +360,8 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-medium text-gray-700">Two-Factor Authentication</h4>
-                        <p className="text-sm text-gray-500">Add an extra layer of security</p>
+                        <h4 className="font-medium text-black">Two-Factor Authentication</h4>
+                        <p className="text-sm text-black">Add an extra layer of security</p>
                       </div>
                       <button
                         onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
@@ -376,11 +376,11 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Profile Visibility</label>
+                      <label className="block text-sm font-medium text-black mb-2">Profile Visibility</label>
                       <select
                         value={profileVisibility}
                         onChange={(e) => setProfileVisibility(e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       >
                         <option value="public">Public - Anyone can see</option>
                         <option value="followers">Followers only</option>
@@ -394,11 +394,11 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
               {/* Interests and Tags */}
               {activeSection === 'interests' && (
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-800">Interests & Skills</h3>
+                  <h3 className="text-xl font-semibold text-black">Interests & Skills</h3>
                   
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-3">Tech Skills & Interests</h4>
-                    <p className="text-sm text-gray-500 mb-4">Select topics you're interested in to personalize your feed</p>
+                    <h4 className="font-medium text-black mb-3">Tech Skills & Interests</h4>
+                    <p className="text-sm text-black mb-4">Select topics you're interested in to personalize your feed</p>
                     <div className="flex flex-wrap gap-2">
                       {techTags.map(tag => (
                         <button
@@ -421,13 +421,13 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
               {/* Preferences */}
               {activeSection === 'preferences' && (
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-800">Preferences & Notifications</h3>
+                  <h3 className="text-xl font-semibold text-black">Preferences & Notifications</h3>
                   
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-700">Email Notifications</h4>
+                    <h4 className="font-medium text-black">Email Notifications</h4>
                     {Object.entries(emailNotifications).map(([key, value]) => (
                       <div key={key} className="flex items-center justify-between">
-                        <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                        <span className="text-black capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
                         <button
                           onClick={() => setEmailNotifications(prev => ({ ...prev, [key]: !value }))}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
@@ -444,11 +444,11 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+                      <label className="block text-sm font-medium text-black mb-2">Theme</label>
                       <select
                         value={theme}
                         onChange={(e) => setTheme(e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       >
                         <option value="dark">Dark</option>
                         <option value="light">Light</option>
@@ -457,11 +457,11 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Font Size</label>
+                      <label className="block text-sm font-medium text-black mb-2">Font Size</label>
                       <select
                         value={fontSize}
                         onChange={(e) => setFontSize(e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input"
                       >
                         <option value="small">Small</option>
                         <option value="medium">Medium</option>
@@ -475,12 +475,12 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
               {/* Advanced */}
               {activeSection === 'advanced' && (
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-800">Advanced Settings</h3>
+                  <h3 className="text-xl font-semibold text-black">Advanced Settings</h3>
                   
                   <div className="space-y-4">
                     <div className="p-4 border border-red-200 rounded-lg bg-red-50">
                       <h4 className="font-medium text-red-800 mb-2">Danger Zone</h4>
-                      <p className="text-sm text-red-600 mb-4">These actions cannot be undone</p>
+                      <p className="text-sm text-black mb-4">These actions cannot be undone</p>
                       <div className="space-y-2">
                         <button className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
                           <Trash2 className="w-4 h-4" />
@@ -496,21 +496,21 @@ const EditProfileModal = ({ isOpen, onClose, onUpdate }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+        <div className="sticky bottom-0 flex items-center justify-between p-6 border-t border-gray-200 bg-white/95 backdrop-blur">
           <div className="text-sm text-gray-500">
             {hasChanges && "You have unsaved changes"}
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleDiscard}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition"
+              className="btn-secondary"
             >
               Discard Changes
             </button>
             <button
               onClick={handleSave}
               disabled={loading || !hasChanges}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>

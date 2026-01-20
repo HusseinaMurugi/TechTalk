@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { TrendingUp, Users, Hash } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import PostCard from '../components/PostCard';
 import api from '../utils/api';
@@ -11,6 +11,8 @@ const Explore = () => {
   const [trendingUsers, setTrendingUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState('posts');
+  const [following, setFollowing] = useState(new Set());
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTrendingTags();
@@ -51,6 +53,28 @@ const Explore = () => {
       setPosts(response.data);
     } catch (error) {
       console.error('Error fetching posts:', error);
+    }
+  };
+
+  const handleFollowToggle = async (targetUserId) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    try {
+      if (following.has(targetUserId)) {
+        await api.delete(`/users/${targetUserId}/follow`);
+        const next = new Set(following);
+        next.delete(targetUserId);
+        setFollowing(next);
+      } else {
+        await api.post(`/users/${targetUserId}/follow`);
+        const next = new Set(following);
+        next.add(targetUserId);
+        setFollowing(next);
+      }
+    } catch (error) {
+      console.error('Error toggling follow:', error);
     }
   };
 
@@ -138,7 +162,7 @@ const Explore = () => {
                 {trendingTags.map((item, index) => (
                   <Link
                     key={item.tag}
-                    to={`/search?q=${encodeURIComponent(item.tag)}`}
+                    to={`/topic/${encodeURIComponent(item.tag)}`}
                     className="block p-6 hover:bg-[#1f3b5c]/50 transition"
                   >
                     <div className="flex items-start justify-between">
@@ -169,24 +193,39 @@ const Explore = () => {
               </div>
               <div className="divide-y divide-[#1f3b5c]">
                 {trendingUsers.map((trendingUser) => (
-                  <Link
+                  <div
                     key={trendingUser.id}
-                    to={`/users/${trendingUser.id}`}
-                    className="block p-6 hover:bg-[#1f3b5c]/50 transition"
+                    className="p-6 hover:bg-[#1f3b5c]/50 transition"
                   >
                     <div className="flex items-center gap-4">
-                      <img
-                        src={trendingUser.profile_pic || 'https://via.placeholder.com/60'}
-                        alt={trendingUser.username}
-                        className="avatar w-16 h-16"
-                      />
+                      <Link to={`/users/${trendingUser.id}`}>
+                        <img
+                          src={trendingUser.profile_pic || 'https://via.placeholder.com/60'}
+                          alt={trendingUser.username}
+                          className="avatar w-16 h-16"
+                        />
+                      </Link>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{trendingUser.username}</h3>
+                        <Link to={`/users/${trendingUser.id}`} className="font-semibold text-lg hover:underline">
+                          {trendingUser.username}
+                        </Link>
                         <p className="text-[#8b949e] text-sm">{trendingUser.bio || 'Tech enthusiast'}</p>
-                        <p className="text-[#1f6feb] text-sm mt-1">{trendingUser.followers_count} followers</p>
+                        {typeof trendingUser.followers_count !== 'undefined' && (
+                          <p className="text-[#1f6feb] text-sm mt-1">{trendingUser.followers_count} followers</p>
+                        )}
                       </div>
+                      <button
+                        onClick={() => handleFollowToggle(trendingUser.id)}
+                        className={`px-4 py-2 rounded-lg font-medium transition ${
+                          following.has(trendingUser.id)
+                            ? 'bg-transparent border border-[#1f6feb] text-[#1f6feb] hover:bg-[#1f6feb]/10'
+                            : 'bg-[#1f6feb] text-white hover:bg-[#1a5dcc]'
+                        }`}
+                      >
+                        {following.has(trendingUser.id) ? 'Following' : 'Follow'}
+                      </button>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             </div>

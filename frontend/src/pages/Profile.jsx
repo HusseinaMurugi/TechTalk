@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import PostCard from '../components/PostCard';
 import EditProfileModal from '../components/EditProfileModal';
 import api from '../utils/api';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const { user, updateUser } = useContext(AuthContext);
@@ -64,15 +65,15 @@ const Profile = () => {
               </>
               
               <div className="flex gap-6 mt-4 text-black">
-                <div>
+                <button type="button" className="hover:opacity-80" onClick={() => setActiveTab('posts')}>
                   <span className="font-bold">{posts.length}</span> Posts
-                </div>
-                <div>
+                </button>
+                <button type="button" className="hover:opacity-80" onClick={() => setActiveTab('followers')}>
                   <span className="font-bold">{followers.length}</span> Followers
-                </div>
-                <div>
+                </button>
+                <button type="button" className="hover:opacity-80" onClick={() => setActiveTab('following')}>
                   <span className="font-bold">{following.length}</span> Following
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -110,9 +111,29 @@ const Profile = () => {
           >
             Tagged Posts ({mentions.length})
           </button>
+          <button
+            onClick={() => setActiveTab('followers')}
+            className={`pb-3 px-4 font-semibold transition text-black ${
+              activeTab === 'followers'
+                ? 'border-b-2 border-blue-600'
+                : 'hover:text-gray-600'
+            }`}
+          >
+            Followers ({followers.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('following')}
+            className={`pb-3 px-4 font-semibold transition text-black ${
+              activeTab === 'following'
+                ? 'border-b-2 border-blue-600'
+                : 'hover:text-gray-600'
+            }`}
+          >
+            Following ({following.length})
+          </button>
         </div>
 
-        {activeTab === 'posts' ? (
+        {activeTab === 'posts' && (
           posts.length === 0 ? (
             <div className="card-dark p-8 text-center text-gray-500">
               You haven't posted anything yet.
@@ -122,7 +143,9 @@ const Profile = () => {
               {posts.map((post) => <PostCard key={post.id} post={post} onUpdate={loadProfile} />)}
             </div>
           )
-        ) : activeTab === 'reposts' ? (
+        )}
+
+        {activeTab === 'reposts' && (
           reposts.length === 0 ? (
             <div className="card-dark p-8 text-center text-gray-500">
               You haven't reposted anything yet.
@@ -132,7 +155,9 @@ const Profile = () => {
               {reposts.map((post) => <PostCard key={post.id} post={post} onUpdate={loadProfile} />)}
             </div>
           )
-        ) : (
+        )}
+
+        {activeTab === 'mentions' && (
           mentions.length === 0 ? (
             <div className="card-dark p-8 text-center text-gray-500">
               You haven't been tagged in any posts yet.
@@ -142,6 +167,68 @@ const Profile = () => {
               {mentions.map((post) => <PostCard key={post.id} post={post} onUpdate={loadProfile} />)}
             </div>
           )
+        )}
+
+        {activeTab === 'followers' && (
+          <div className="card-dark">
+            <div className="p-6 border-b border-[#1f3b5c]">
+              <h2 className="text-xl font-semibold">Followers</h2>
+            </div>
+            {followers.length === 0 ? (
+              <div className="p-8 text-center text-[#8b949e]">No followers yet.</div>
+            ) : (
+              <div className="divide-y divide-[#1f3b5c]">
+                {followers.map(f => (
+                  <Link
+                    key={f.id}
+                    to={`/users/${f.id}`}
+                    className="flex items-center gap-4 p-6 hover:bg-[#1f3b5c]/50 transition"
+                  >
+                    <img
+                      src={f.profile_pic || 'https://via.placeholder.com/60'}
+                      alt={f.username}
+                      className="avatar w-14 h-14"
+                    />
+                    <div>
+                      <div className="font-semibold">{f.username}</div>
+                      <div className="text-[#8b949e] text-sm">{f.bio}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'following' && (
+          <div className="card-dark">
+            <div className="p-6 border-b border-[#1f3b5c]">
+              <h2 className="text-xl font-semibold">Following</h2>
+            </div>
+            {following.length === 0 ? (
+              <div className="p-8 text-center text-[#8b949e]">You're not following anyone yet.</div>
+            ) : (
+              <div className="divide-y divide-[#1f3b5c]">
+                {following.map(f => (
+                  <Link
+                    key={f.id}
+                    to={`/users/${f.id}`}
+                    className="flex items-center gap-4 p-6 hover:bg-[#1f3b5c]/50 transition"
+                  >
+                    <img
+                      src={f.profile_pic || 'https://via.placeholder.com/60'}
+                      alt={f.username}
+                      className="avatar w-14 h-14"
+                    />
+                    <div>
+                      <div className="font-semibold">{f.username}</div>
+                      <div className="text-[#8b949e] text-sm">{f.bio}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         )}
         
         <EditProfileModal

@@ -16,15 +16,21 @@ const PostCard = ({ post, onUpdate }) => {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const renderContentWithHashtags = (content) => {
     const parts = content.split(/(#\w+|@\w+)/);
     return parts.map((part, idx) => {
       if (part.startsWith('#')) {
+        const tag = part.substring(1);
         return (
-          <span key={idx} className="text-blue-600 font-semibold hover:underline cursor-pointer">
+          <Link
+            key={idx}
+            to={`/topic/${encodeURIComponent(tag)}`}
+            className="text-blue-600 font-semibold hover:underline"
+          >
             {part}
-          </span>
+          </Link>
         );
       } else if (part.startsWith('@')) {
         return (
@@ -130,14 +136,17 @@ const PostCard = ({ post, onUpdate }) => {
     }
   };
 
-  const handleDelete = async () => {
-    if (window.confirm('Delete this post?')) {
-      try {
-        await api.delete(`/posts/${post.id}`);
-        if (onUpdate) onUpdate();
-      } catch (error) {
-        console.error('Error deleting post:', error);
-      }
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await api.delete(`/posts/${post.id}`);
+      setShowDeleteModal(false);
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      console.error('Error deleting post:', error);
     }
   };
 
@@ -157,7 +166,7 @@ const PostCard = ({ post, onUpdate }) => {
           </div>
         </Link>
         {user?.id === post.author.id && (
-          <button onClick={handleDelete} className="text-red-400 hover:text-red-300 font-medium">
+          <button onClick={() => setShowDeleteModal(true)} className="text-red-400 hover:text-red-300 font-medium">
             Delete
           </button>
         )}
@@ -168,9 +177,13 @@ const PostCard = ({ post, onUpdate }) => {
       {post.tags && (
         <div className="mb-3 flex flex-wrap gap-2">
           {post.tags.split(',').map((tag, idx) => (
-            <span key={idx} className="bg-[#1f6feb]/20 text-[#1f6feb] px-3 py-1 rounded-full text-sm font-medium">
-              {tag.trim()}
-            </span>
+            <Link
+              key={idx}
+              to={`/topic/${encodeURIComponent(tag.trim())}`}
+              className="bg-[#1f6feb]/20 text-[#1f6feb] px-3 py-1 rounded-full text-sm font-medium hover:bg-[#1f6feb]/30"
+            >
+              #{tag.trim()}
+            </Link>
           ))}
         </div>
       )}
@@ -242,6 +255,24 @@ const PostCard = ({ post, onUpdate }) => {
               >
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800">Delete Post</h3>
+            </div>
+            <div className="p-4">
+              <p className="text-gray-700">Are you sure you want to delete this post? This action cannot be undone.</p>
+            </div>
+            <div className="p-4 border-t border-gray-200 flex justify-end gap-3">
+              <button onClick={() => setShowDeleteModal(false)} className="btn-secondary">Cancel</button>
+              <button onClick={confirmDelete} className="btn-primary bg-red-600 hover:bg-red-700">Delete</button>
             </div>
           </div>
         </div>

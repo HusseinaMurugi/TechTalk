@@ -11,9 +11,12 @@ const UserProfile = () => {
   const { user: currentUser } = useContext(AuthContext);
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [reposts, setReposts] = useState([]);
+  const [mentions, setMentions] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [activeTab, setActiveTab] = useState('posts');
 
   useEffect(() => {
     loadUserProfile();
@@ -21,14 +24,18 @@ const UserProfile = () => {
 
   const loadUserProfile = async () => {
     try {
-      const [userRes, postsRes, followersRes, followingRes] = await Promise.all([
+      const [userRes, postsRes, repostsRes, mentionsRes, followersRes, followingRes] = await Promise.all([
         api.get(`/users/${userId}`),
         api.get(`/users/${userId}/posts`),
+        api.get(`/users/${userId}/reposts`),
+        api.get(`/users/${userId}/mentions`),
         api.get(`/users/${userId}/followers`),
         api.get(`/users/${userId}/following`),
       ]);
       setUser(userRes.data);
       setPosts(postsRes.data);
+      setReposts(repostsRes.data);
+      setMentions(mentionsRes.data);
       setFollowers(followersRes.data);
       setFollowing(followingRes.data);
       
@@ -112,15 +119,61 @@ const UserProfile = () => {
           </div>
         </div>
 
-        <h2 className="text-xl font-bold mb-4 text-black">Posts</h2>
-        {posts.length === 0 ? (
-          <div className="card-dark p-8 text-center text-gray-600">
-            No posts yet.
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {posts.map((post) => <PostCard key={post.id} post={post} onUpdate={loadUserProfile} />)}
-          </div>
+        <div className="mb-4 flex gap-4 border-b border-gray-300 bg-white rounded-t-lg">
+          <button
+            onClick={() => setActiveTab('posts')}
+            className={`pb-3 px-4 font-semibold transition text-black ${
+              activeTab === 'posts' ? 'border-b-2 border-blue-600' : 'hover:text-gray-600'
+            }`}
+          >
+            Posts ({posts.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('reposts')}
+            className={`pb-3 px-4 font-semibold transition text-black ${
+              activeTab === 'reposts' ? 'border-b-2 border-blue-600' : 'hover:text-gray-600'
+            }`}
+          >
+            Reposts ({reposts.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('mentions')}
+            className={`pb-3 px-4 font-semibold transition text-black ${
+              activeTab === 'mentions' ? 'border-b-2 border-blue-600' : 'hover:text-gray-600'
+            }`}
+          >
+            Tagged ({mentions.length})
+          </button>
+        </div>
+
+        {activeTab === 'posts' && (
+          posts.length === 0 ? (
+            <div className="card-dark p-8 text-center text-gray-600">No posts yet.</div>
+          ) : (
+            <div className="space-y-4">
+              {posts.map((post) => <PostCard key={post.id} post={post} onUpdate={loadUserProfile} />)}
+            </div>
+          )
+        )}
+
+        {activeTab === 'reposts' && (
+          reposts.length === 0 ? (
+            <div className="card-dark p-8 text-center text-gray-600">No reposts yet.</div>
+          ) : (
+            <div className="space-y-4">
+              {reposts.map((post) => <PostCard key={post.id} post={post} onUpdate={loadUserProfile} />)}
+            </div>
+          )
+        )}
+
+        {activeTab === 'mentions' && (
+          mentions.length === 0 ? (
+            <div className="card-dark p-8 text-center text-gray-600">No mentions yet.</div>
+          ) : (
+            <div className="space-y-4">
+              {mentions.map((post) => <PostCard key={post.id} post={post} onUpdate={loadUserProfile} />)}
+            </div>
+          )
         )}
       </div>
     </div>

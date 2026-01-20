@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
-from typing import List
+from typing import List, Optional
 
 from database import get_db, init_db
 from models import User, Post, Comment, Like, Follower, Notification, Repost, Message
@@ -14,7 +14,9 @@ from schemas import (
     CommentCreate, CommentResponse,
     NotificationResponse, Token, MessageCreate, MessageResponse
 )
-from auth import hash_password, verify_password, create_access_token, get_current_user
+from auth import hash_password, verify_password, create_access_token, get_current_user, SECRET_KEY, ALGORITHM
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import JWTError, jwt
 
 app = FastAPI(title="TechTalk API")
 
@@ -56,6 +58,27 @@ allowed_origins = [
 @app.on_event("startup")
 def startup_event():
     init_db()
+
+# Optional auth dependency for public endpoints that may personalize data
+optional_security = HTTPBearer(auto_error=False)
+
+def get_optional_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    if not credentials:
+        return None
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        sub = payload.get("sub")
+        if not sub:
+            return None
+        user_id = int(sub)
+        user = db.query(User).filter(User.id == user_id).first()
+        return user
+    except Exception:
+        return None
 
 # Root endpoint - CORS fixed
 @app.get("/")
@@ -290,23 +313,29 @@ def get_suggested_users(
 def get_post(
     post_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_optional_user)
 ):
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    
-    # Add computed fields
-    post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
-    post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
-    post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
-    post.is_liked = db.query(Like).filter(
-        Like.post_id == post.id, Like.user_id == current_user.id
-    ).first() is not None
-    post.is_reposted = db.query(Repost).filter(
-        Repost.post_id == post.id, Repost.user_id == current_user.id
-    ).first() is not None
-    
+
+    # Base counts
+    post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar() or 0
+    post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar() or 0
+    post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar() or 0
+
+    # Flags depend on auth
+    if current_user:
+        post.is_liked = db.query(Like).filter(
+            Like.post_id == post.id, Like.user_id == current_user.id
+        ).first() is not None
+        post.is_reposted = db.query(Repost).filter(
+            Repost.post_id == post.id, Repost.user_id == current_user.id
+        ).first() is not None
+    else:
+        post.is_liked = False
+        post.is_reposted = False
+
     return post
 
 # Get posts by user ID (public - no auth required)
@@ -407,23 +436,19 @@ def delete_post(
 def search_posts(
     q: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
 ):
     posts = db.query(Post).filter(Post.content.contains(q)).order_by(Post.timestamp.desc()).limit(20).all()
-    
+
     result = []
     for post in posts:
-        post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar()
-        post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar()
-        post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar()
-        post.is_liked = db.query(Like).filter(
-            Like.post_id == post.id, Like.user_id == current_user.id
-        ).first() is not None
-        post.is_reposted = db.query(Repost).filter(
-            Repost.post_id == post.id, Repost.user_id == current_user.id
-        ).first() is not None
+        post.likes_count = db.query(func.count(Like.id)).filter(Like.post_id == post.id).scalar() or 0
+        post.comments_count = db.query(func.count(Comment.id)).filter(Comment.post_id == post.id).scalar() or 0
+        post.reposts_count = db.query(func.count(Repost.id)).filter(Repost.post_id == post.id).scalar() or 0
+        # For public search, default flags to False
+        post.is_liked = False
+        post.is_reposted = False
         result.append(post)
-    
+
     return result
 
 # Create comment on post
@@ -679,8 +704,9 @@ def get_unread_notifications_count(
     count = db.query(func.count(Notification.id)).filter(
         Notification.user_id == current_user.id,
         ~Notification.read
-    ).scalar()
-    return {"count": count}
+    ).scalar() or 0
+    # Frontend expects `unread_count`
+    return {"unread_count": count}
 
 
 # Repost a post

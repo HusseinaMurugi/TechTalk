@@ -110,9 +110,13 @@ const SinglePost = () => {
           {post.tags && (
             <div className="mb-3 flex flex-wrap gap-2">
               {post.tags.split(',').map((tag, idx) => (
-                <span key={idx} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
-                  {tag.trim()}
-                </span>
+                <Link
+                  key={idx}
+                  to={`/topic/${encodeURIComponent(tag.trim())}`}
+                  className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-200"
+                >
+                  #{tag.trim()}
+                </Link>
               ))}
             </div>
           )}

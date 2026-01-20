@@ -44,15 +44,15 @@ const OnboardingModal = ({ user, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+    <div className="fixed inset-0 app-bg bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl max-w-md w-full p-8 border border-white/40">
         {step === 1 ? (
           <>
-            <h2 className="text-2xl font-bold mb-2 text-gray-800">Welcome to TechTalk! 🎉</h2>
-            <p className="text-gray-600 mb-6">Let's set up your profile</p>
+            <h2 className="text-2xl font-bold mb-2 text-black">Welcome to TechTalk! 🎉</h2>
+            <p className="text-black mb-6">Let's set up your profile</p>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2 font-medium">Tell us about yourself</label>
+              <label className="block text-black mb-2 font-medium">Tell us about yourself</label>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
@@ -79,8 +79,8 @@ const OnboardingModal = ({ user, onClose }) => {
           </>
         ) : (
           <>
-            <h2 className="text-2xl font-bold mb-2 text-gray-800">Follow Some Users 👥</h2>
-            <p className="text-gray-600 mb-6">Discover interesting people to follow</p>
+            <h2 className="text-2xl font-bold mb-2 text-black">Follow Some Users 👥</h2>
+            <p className="text-black mb-6">Discover interesting people to follow</p>
             
             <div className="space-y-3 mb-6 max-h-80 overflow-y-auto">
               {suggestedUsers.map((suggestedUser) => (

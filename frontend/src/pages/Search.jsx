@@ -1,5 +1,5 @@
 // Search page - search for users and posts
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 
@@ -9,6 +9,25 @@ const Search = () => {
   const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState('users');
   const [searched, setSearched] = useState(false);
+  const [trendingTags, setTrendingTags] = useState([]);
+  const [suggestedUsers, setSuggestedUsers] = useState([]);
+
+  useEffect(() => {
+    const loadSideData = async () => {
+      try {
+        const [tagsRes, usersRes] = await Promise.all([
+          api.get('/trending/tags'),
+          api.get('/users/suggested?limit=10'),
+        ]);
+        setTrendingTags(tagsRes.data || []);
+        setSuggestedUsers(usersRes.data || []);
+      } catch (err) {
+        setTrendingTags([]);
+        setSuggestedUsers([]);
+      }
+    };
+    loadSideData();
+  }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -147,6 +166,61 @@ const Search = () => {
             <p className="text-[#8b949e] mt-2">Enter a keyword and click search</p>
           </div>
         )}
+
+        <div className="grid lg:grid-cols-3 gap-6 mt-6">
+          <div className="lg:col-span-2"></div>
+          <div className="lg:col-span-1 space-y-6">
+            <div className="card-dark">
+              <div className="p-6 border-b border-[#1f3b5c]">
+                <h2 className="text-xl font-semibold">Trending Topics</h2>
+              </div>
+              <div className="divide-y divide-[#1f3b5c]">
+                {trendingTags.map((t) => (
+                  <Link
+                    key={t.tag}
+                    to={`/topic/${encodeURIComponent(t.tag)}`}
+                    className="block p-4 hover:bg-[#1f3b5c]/50 transition"
+                  >
+                    <div className="flex justify-between">
+                      <span className="text-white font-medium">#{t.tag}</span>
+                      <span className="text-[#8b949e] text-sm">{t.count}</span>
+                    </div>
+                  </Link>
+                ))}
+                {trendingTags.length === 0 && (
+                  <div className="p-4 text-[#8b949e]">No trending topics</div>
+                )}
+              </div>
+            </div>
+            <div className="card-dark">
+              <div className="p-6 border-b border-[#1f3b5c]">
+                <h2 className="text-xl font-semibold">Suggested Users</h2>
+              </div>
+              <div className="divide-y divide-[#1f3b5c]">
+                {suggestedUsers.map((u) => (
+                  <Link
+                    key={u.id}
+                    to={`/users/${u.id}`}
+                    className="flex items-center gap-3 p-4 hover:bg-[#1f3b5c]/50 transition"
+                  >
+                    <img
+                      src={u.profile_pic || 'https://via.placeholder.com/40'}
+                      alt={u.username}
+                      className="avatar w-10 h-10"
+                    />
+                    <div>
+                      <div className="font-semibold">{u.username}</div>
+                      <div className="text-[#8b949e] text-sm">{u.bio}</div>
+                    </div>
+                  </Link>
+                ))}
+                {suggestedUsers.length === 0 && (
+                  <div className="p-4 text-[#8b949e]">No suggestions</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
